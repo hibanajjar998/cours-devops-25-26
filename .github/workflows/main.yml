@@ -66,7 +66,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/
-          file: ./Dockerfile
+          file: ./lesson3_IntegrationContinue/exemple1_helloapp_ci//Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/myhello_app:${{ github.sha }}
 
