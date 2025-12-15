@@ -48,6 +48,8 @@ jobs:
     needs: quality-check # Ce job attend la réussite de quality-check
     runs-on: ubuntu-latest
     if: github.event_name == 'push' # Pousse l'image uniquement lors des merges réels, pas sur les PRs
+    permissions:
+      packages: write
     
     steps:
       - name: Récupération du code (Checkout)
