@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:9.5.0
+    volumes:
+      - db-volume:/var/lib/mysql
+      - ./articles.sql:/docker-entrypoint-initdb.d/articles.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    deploy:
+      mode: replicated
+      replicas: 1 
+      restart_policy:
+        condition: any
+
+  app:
+    build: .
+    image: myapp
+    volumes:
+        - ./app:/var/www/html
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db 
+      DB_USER: test
+      DB_PASS: test 
+      DB_NAME: test
+    deploy:
+      mode: replicated
+      replicas: 3
+      restart_policy:
+        condition: any
+
+volumes:
+  db-volume:
