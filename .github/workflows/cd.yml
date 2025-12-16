@@ -4,7 +4,6 @@ name: Pipeline CI/CD
 on:
   push:
     branches: [ "main" ]
-    paths: ["lesson3_IntegrationContinue/exemple1_helloapp_ci/**"]
   pull_request:
     branches: [ "main" ]
     paths: ["lesson3_IntegrationContinue/exemple1_helloapp_ci/**"]
