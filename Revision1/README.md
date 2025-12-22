@@ -93,7 +93,7 @@ EXPOSE 8000
 CMD ["python", "-m", "http.server", "8000"]
 ```
 
-## D. Créer localement une branche des tests
+## E. Créer localement une branche des tests
 
 1. Créer et basculer vers une branche `tests`
 2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires
@@ -106,7 +106,7 @@ CMD ["python", "-m", "http.server", "8000"]
 ### Tests Unitaires
 - **Jest** : teste une fonction isolée dans assets/js.
 
-## E. Lancer les tests avant de créer l'image Docker
+## F. Lancer les tests avant de créer l'image Docker
 1. modifier le `Dockerfile` pour d'abord lancer les tests avant de construire l'image
 2. fixer les erreurs (`--fix`)
 3. initier un conteneur pour vérifier que votre application web fonctionne toujours bien
@@ -131,7 +131,7 @@ EXPOSE 80
 docker run 
 ```
 
-## E. Récupérer le fichier `package-lock.json`
+## G. Récupérer le fichier `package-lock.json`
 1. créer une image qui s'arrête au premier stage (`--target build-stage`)
 2. initier un conteneur de cette image
 2. copier le fichier `/app/package-lock.json` généré dans le conteneur vers le dossier local de l'app
@@ -153,7 +153,7 @@ git push origin main
 ```
 
 
-## E. Fusionner avec la branche 'main'
+## H. Fusionner avec la branche 'main'
 1. Basculer vers la branche 'main'
 2. Fusionner la branche 'tests'
 3. supprimer la branche 'tests'
@@ -171,14 +171,14 @@ git push origin main
 git pull origin main
 ```
 
-## E. Écrire le workflow GitHub
+## I. Écrire le workflow GitHub
 1. créer un fichier `.github/workflows/ci_test_build.yml`
 2. y créer un job pour les tests, 
 3. y ajouter un job qui dépend du premier, et qui construit l'image et la pousse au GHCR
 4. déclencher le job, débugger
 
 
-## L. Déployer localement un docker swarm
+## J. Déployer localement un docker swarm
  1. Créer un fichier `docker-compose.yml` contenant un seul service, et y configurer le déploiement
  2. créer un swarm docker et le déployer
  3. mettre à l'echelle en augmentant le nombre de réplicas
