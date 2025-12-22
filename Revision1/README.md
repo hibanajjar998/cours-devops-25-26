@@ -96,7 +96,7 @@ CMD ["python", "-m", "http.server", "8000"]
 ## E. Créer localement une branche des tests
 
 1. Créer et basculer vers une branche `tests`
-2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires
+2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires ([voir branch tests](https://github.com/hibanajjar998/html_multiverse_app/tree/tests))
 
 ### Tests de Qualité de Code, de Syntaxe (Linting)
 - **HTMLHint** : vérifie les balises HTML sont bien fermées et respectent les standards.
