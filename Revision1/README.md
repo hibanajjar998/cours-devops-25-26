@@ -107,13 +107,13 @@ CMD ["python", "-m", "http.server", "8000"]
 - **Jest** : teste une fonction isolée dans assets/js.
 
 ## F. Lancer les tests avant de créer l'image Docker
-1. modifier le `Dockerfile` pour d'abord lancer les tests avant de construire l'image
+1. créer un nouveau fichier `Dockerfile_tests` pour d'abord y lancer les tests avant de construire l'image
 2. fixer les erreurs (`--fix`)
 3. initier un conteneur pour vérifier que votre application web fonctionne toujours bien
 4. supprimer le conteneur, puis l'image
 
 ```Dockerfile
-# Dockerfile modifié
+# Dockerfile modifié > fichier ./Dockerfile_tests
 FROM node:slim AS build-stage
 WORKDIR /app
 COPY package.json ./
@@ -128,7 +128,8 @@ EXPOSE 80
 ```
 
 ```powershell
-docker run 
+docker build -t multiverse_app --file Dockerfile_tests .
+docker run --name multiverse_c -p 8080:80 -d multiverse_app
 ```
 
 ## G. Récupérer le fichier `package-lock.json`
