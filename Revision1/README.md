@@ -134,6 +134,7 @@ docker run --name multiverse_c -p 8080:80 -d multiverse_app
 ```
 
 ## G. Récupérer le fichier `package-lock.json`
+(téléchargeable [ici](https://drive.google.com/file/d/17LB6RvfG5U9yK9T0bMB3PCJnDGpXAeD7/view?usp=sharing))
 1. créer une image qui s'arrête au premier stage (`--target build-stage`)
 2. initier un conteneur de cette image
 2. copier le fichier `/app/package-lock.json` généré dans le conteneur vers le dossier local de l'app
