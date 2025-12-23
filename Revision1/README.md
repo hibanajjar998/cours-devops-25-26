@@ -1,5 +1,6 @@
 # Exercice de révision
 
+- Correction de l'exercice: [GINF-A](https://github.com/hibanajjar998/html_multiverse_grpA) et [GINF-B](https://github.com/hibanajjar998/html_multiverse_app)
 
 ## Configurations git préliminaire
 
@@ -143,7 +144,7 @@ docker run --name multiverse_c -p 8080:80 -d multiverse_app
 
 ```powershell
 # récupérer le fichier
-docker build --target build-stage -t mv_app_tmp .
+docker build --target build-stage --file Dockerfile_tests -t mv_app_tmp .
 docker run --name tmp_c mv_app_tmp
 docker cp tmp_c:/app/package-lock.json ./package-lock.json
 docker rm tmp_c
