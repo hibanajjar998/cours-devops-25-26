@@ -1,5 +1,6 @@
 # Exercice de révision
 
+- Correction de l'exercice: [GINF-A](https://github.com/hibanajjar998/html_multiverse_grpA) et [GINF-B](https://github.com/hibanajjar998/html_multiverse_app)
 
 ## Configurations git préliminaire
 
@@ -22,7 +23,7 @@ Il existe d'autres sites similaires, contenant plusieurs modèles de site en HTM
 - [https://website-templates.github.io](https://website-templates.github.io)
 
 ## B. Initier git et sauvegarder
-1. Créer et remplir un fichier `.gitattributes`
+1. Créer et remplir un fichier `.gitattributes` (ou copier [ce fichier](https://github.com/hibanajjar998/articlesapp_ctrl1/blob/main/.gitattributes))
 2. Ouvrir git à l'intérieur du dossier créé,
 2. Initier git, Ajouter tous les documents, Sauvegarder (commit).
 
@@ -93,27 +94,28 @@ EXPOSE 8000
 CMD ["python", "-m", "http.server", "8000"]
 ```
 
-## D. Créer localement une branche des tests
+## E. Créer localement une branche des tests
 
-1. Créer et basculer vers une branche `tests`
-2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires
+1. Créer et basculer vers une branche `tests` (commande: `git checkout -b tests`)
+2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires ([lien téléchargement](https://drive.google.com/file/d/1aoq4ncueOZ2pmXpXHb45mRwA_qen-bzV/view?usp=sharing))
+3. ajouter le fichier de configuration (pour installation des packages) `./package.json`
 
 ### Tests de Qualité de Code, de Syntaxe (Linting)
-- **HTMLHint** : vérifie les balises HTML sont bien fermées et respectent les standards.
-- **Stylelint** : pour les dossiers sass et css (feuilles de style).
-- **ESLint** : pour les fichiers dans le dossier js (JavaScript).
+- **HTMLHint** : vérifie les balises HTML sont bien fermées et respectent les standards -> `./.htmlhintrc`
+- **Stylelint** : pour les dossiers sass et css (feuilles de style) -> `./.stylelintrc.json`
+- **ESLint** : pour les fichiers dans le dossier js (JavaScript) -> `./eslint.config.js`
 
 ### Tests Unitaires
-- **Jest** : teste une fonction isolée dans assets/js.
+- **Jest** : teste une fonction isolée dans assets/js  -> `./jest.setup.js` et `./tests/main.test.js`
 
-## E. Lancer les tests avant de créer l'image Docker
-1. modifier le `Dockerfile` pour d'abord lancer les tests avant de construire l'image
+## F. Lancer les tests avant de créer l'image Docker
+1. créer un nouveau fichier `Dockerfile_tests` pour d'abord y lancer les tests avant de construire l'image
 2. fixer les erreurs (`--fix`)
 3. initier un conteneur pour vérifier que votre application web fonctionne toujours bien
 4. supprimer le conteneur, puis l'image
 
 ```Dockerfile
-# Dockerfile modifié
+# Dockerfile modifié > fichier ./Dockerfile_tests
 FROM node:slim AS build-stage
 WORKDIR /app
 COPY package.json ./
@@ -128,10 +130,12 @@ EXPOSE 80
 ```
 
 ```powershell
-docker run 
+docker build -t multiverse_app --file Dockerfile_tests .
+docker run --name multiverse_c -p 8080:80 -d multiverse_app
 ```
 
-## E. Récupérer le fichier `package-lock.json`
+## G. Récupérer le fichier `package-lock.json`
+(téléchargeable [ici](https://drive.google.com/file/d/17LB6RvfG5U9yK9T0bMB3PCJnDGpXAeD7/view?usp=sharing))
 1. créer une image qui s'arrête au premier stage (`--target build-stage`)
 2. initier un conteneur de cette image
 2. copier le fichier `/app/package-lock.json` généré dans le conteneur vers le dossier local de l'app
@@ -140,7 +144,7 @@ docker run
 
 ```powershell
 # récupérer le fichier
-docker build --target build-stage -t mv_app_tmp .
+docker build --target build-stage --file Dockerfile_tests -t mv_app_tmp .
 docker run --name tmp_c mv_app_tmp
 docker cp tmp_c:/app/package-lock.json ./package-lock.json
 docker rm tmp_c
@@ -153,7 +157,7 @@ git push origin main
 ```
 
 
-## E. Fusionner avec la branche 'main'
+## H. Fusionner avec la branche 'main'
 1. Basculer vers la branche 'main'
 2. Fusionner la branche 'tests'
 3. supprimer la branche 'tests'
@@ -171,14 +175,78 @@ git push origin main
 git pull origin main
 ```
 
-## E. Écrire le workflow GitHub
-1. créer un fichier `.github/workflows/ci_test_build.yml`
+## I. Écrire le workflow GitHub
+1. créer un fichier `.github/workflows/ci_test_build.yml` 
 2. y créer un job pour les tests, 
 3. y ajouter un job qui dépend du premier, et qui construit l'image et la pousse au GHCR
 4. déclencher le job, débugger
 
+```yaml
+name: CI-Test-Build
 
-## L. Déployer localement un docker swarm
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+  # Job 1 : TESTS
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Quality Tests (Lint)
+        run: |
+          npm run lint:html
+          npm run lint:jsfix
+
+      - name: Run Unit/Integration Tests (Jest)
+        run: npm test
+
+  # Job 2:  DOCKER BUILD & PUSH
+  build-and-push:
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to the GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.actor }}/mvtest_app:${{ github.sha }}
+```
+
+## J. Déployer localement un docker swarm
  1. Créer un fichier `docker-compose.yml` contenant un seul service, et y configurer le déploiement
  2. créer un swarm docker et le déployer
  3. mettre à l'echelle en augmentant le nombre de réplicas
@@ -200,7 +268,7 @@ services:
       resources:
         limits:
           cpus: '0.2'  # 20% d'un seul coeur CPU
-          memory: 64Mo  # quand dépassé, OOM Kill
+          memory: 64M  # quand dépassé, OOM Kill
 ```
 
 
@@ -211,7 +279,7 @@ docker stack deploy -c docker-compose.yml multiverse_swarm
 
 ### visualiser --------------------
 docker stack ls	#Liste les applications déployées.
-docker service ls	#Affiche l'état des services (vérifie si les 2 replicas sont prêts).
+docker service ls	#Affiche l'état des services (vérifie si les 3 replicas sont prêts).
 docker service ps multiverse_swarm_web	# Montre sur quel "nœud" tourne chaque replica.
 docker stats  # Affiche l'utilisation des resources en temps réel
 
